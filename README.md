@@ -50,11 +50,20 @@ The dataset would be placed under ./In-the-wild-RS folder.
 
 
 ### Code
-In order to run the code, place the DAIN_env python path (for e.g.: path/.conda/envs/DAIN_env/bin/python) in the config.json file, under "DAIN_env_python_path".
-Then, simply run our code by running:
+The code is composed of two separate scripts. This is so in order to both emphasize the plug-and-play nature of the temporal-interpolation module in our
+pipeline, and to allow for different python environments for the external temporal-interpolation code and our code for easier setup.
+The two scripts that need to be run sequentially are:
+1. **part1_PlugAndPlay_TemporalInterpolation.py**  -  This part is the plug-and-play external temporal interpolation (TI) algorithm, detailed in section 4.1 in the paper.
+Here we use (as in the paper) - DAIN [citation below]. This script is to be run with DAIN_env.
+2. **part2_MergeNet_and_xtOptimization.py**  -  This part is our written algorithm GS "sampling", MergeNet and the xt-optimization (detailed in section 4 in the paper). This code is to be run with VideoRS_env. 
+
+**In order to run the entire code**:
 ```bash
+conda activate DAIN_env
+python part1_PlugAndPlay_TemporalInterpolation.py
+conda deactivate
 conda activate VideoRS_env
-python VideoRS_Main.py
+python part2_MergeNet_and_xtOptimization.py
 ```
 This will run the code with default configuration, as used to produce the results in the paper.  
 
@@ -67,8 +76,6 @@ Below are the main configuration parameters to change:
 * **input_RS_folder** - input folder for multiple directories of RS frames. For instance:   input_RS_folder/vid1/{001.png, 002.png,...},   input_RS_folder/vid2/{001.png, 002.png,...}
 * **input_in_name** - string that is in the RS frames' names. Enables using datasets that have RS and GS together in the same folder.
 * **cleanup_during_run** - if 'true' - will delete intermediary results, and save only the final ones. Recommended for memory reasons.  
-* **DAIN_env_python_path** - As detailed in the Environment section - path to the python interpreter compiled for DAIN. 
-For the full list of parameters please refer to the comments inside config.json
 * **MergeNet_config/loading_model/checkpoint** - path to trained MergeNet model. If provided - evals MergeNet using this ckpt instead of retraining MergeNet. Default network provided - The network trained on Carla-RS, as detailed in paper.
 
 
@@ -77,7 +84,7 @@ For the full list of parameters please refer to the comments inside config.json
 
 ### Visual Results
 Below are sample comparisons of our results vs. the SotA competitors.<br />
-RS input, GS-reconstructions and residual misliagnments are shown. <br />
+RS input, GS-reconstructions and residual misliagnments are shown. Please press play. <br />
 ![visual_results](./readme_sources/visual_results.gif)
 
 For all the videos and results please see [project page](https://www.wisdom.weizmann.ac.il/~vision/VideoRS/supplementary/Visual_Results.html).
