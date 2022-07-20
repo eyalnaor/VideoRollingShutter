@@ -1,0 +1,86 @@
+{
+  "debug": false,
+  "working_dir": "",
+  "save_final_images": true,
+  "overrun_dataset_alignment": "carla_left",
+  // can be carla_center for all videos in this dataset,  or carla_center^seq_2 for specific video
+  "dataset": "carla",
+  "alignment": "center",
+//  "video_name": "seq_1",
+  "video_name": null,
+  "validity_loss_ration": 0.5,
+  "scaling_method": "loss_scaling",
+  //loss_scaling   gradient_scaling   no_scaling
+  "num_epochs": 1,
+  "print_every": 100,
+  "optimization": {
+    "name": "Adam",
+    //optimizers: "Adam" "SGD"
+    "lr": 0.1,
+	"SGD_momentum": 0.9,
+    "faiss_nlist": 1024,
+    "faiss_nprobe": 1
+  },
+  "NN_loss": {
+    "name": "weighted_MSE",
+    // "MSE"  "L1"  "weighted_MSE"
+    "weighted_MSE_norm_power": null,
+    //null or float. if float, normalizes weights to [0,1], and then **power
+    "weighted_MSE_cutoff": 1.0,
+    //null or float. Cannot be at the same time as weighted_MSE_norm_power
+    "weighted_MSE_dilation": 5,
+    //null or odd int. int does max over intXint filter (for example 3x3)
+    "NN_patch_size": [5, 1, 7],
+    //NN_patch_size: in [t, y, x]. For e.g. [5,1,7] is a 5x7 tx patch
+    "hor_flip": false,
+    //no point in ver_flip, since using xt patches
+    "temporal_flip": false
+    //using flips may help but requires significant more memory.
+  },
+  "NN_loss_2": {
+    "enable": false,
+    //enable: use two NN losses. To enable both xt and xy patches for example
+    "weight_in_NN": 0.5,
+    //weight_in_NN: weight for this NN compared to other NN loss (regardless of val vs NN ratio)
+    "name": "weighted_MSE",
+    // "MSE"  "L1"  "weighted_MSE"
+    "NN_patch_size": [1, 5, 5],
+    //"NN_patch_size": [5, 1, 7],
+    "hor_flip": false,
+    //no point in ver_flip, since using xt patches
+    "temporal_flip": false
+  },
+  "validity_loss": {
+    "name": "weighted_MSE",
+   // "MSE"  "L1"  "weighted_MSE"
+    "validity_patch_size": [1, 5, 5],
+    "edit_weights": "reversal"
+    //"reversal"    "none"     "inverse"
+
+  },
+  "lr_sched": {
+    "name": "StepLR",
+    // MultiStepLR - for manually set milestones , StepLR for fixed % out of total epochs , MultiStepLR_percentages for manual percentages out of total epochs
+    "params": {
+//      "gamma": 0.67,
+      "gamma": 0.1,
+      // Relevant for StepLR
+//      "step_size": 0.1,
+      "step_size": 0.75,
+      // Only relevant when using MultiStepLR
+      "milestones": [
+        3000,
+        3500
+      ],
+      // Only relevant when using MultiStepLR_percentages
+      "milestones_percentages": [
+        0.70,
+        0.85
+      ]
+    }
+  },
+    "trainer" : {
+  },
+  "organized_data_folder": "./organized_data_after_MergeNet",
+  "tag": ""
+}

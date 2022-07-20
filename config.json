@@ -1,0 +1,101 @@
+{
+  "debug": false,
+  "verbose": true,
+  "working_dir": "./results",
+  // working_dir - where to save the results
+  "input_RS": {
+    "input_RS_folder": "./demo_input",
+    // input_RS_folder - folder that contains directories of frames. for instance provide dataset: InTheWild/{bird_horizontal, taekwondo...}
+    "input_in_name": null
+    // input_in_name - string that is in the RS frames in the input_RS_folder. Enables using the original datasets that have RS and GS together in the same folder.
+  },
+  "GS_centered_around": "left",
+  // GS_centered_around: around which scanline to solve for GS. In the paper we looked at 'center' to compare to competition,
+  // but you can easily modify here. Note that the trained MergeNet trained on 'left'!
+  // can be either 'left' or 'center'
+  "cleanup_during_run": false,
+  // cleanup_during_run - if true, deletes all intermediary results and keeps only the final outputs
+  "tag": "",
+
+
+
+
+  "MergeNet_config": {
+    "loading_model": {
+      "checkpoint": "./MergeNet/Trained_MergeNet.tar",
+      "only_eval": true
+    },
+    "output_type": "image",
+    "image_resudual": true,
+    //  "image" or "weights".  image: outputs "merged" RGB directly.   weights: outputs weights for augs to merge by
+    "architecture": {
+      "hidden_depth": 6,
+      "hidden_width": 64,
+      "activation": "ReLU",
+      "conv_kernel_size": [3,3]
+    },
+      "data_augmenter": {
+        "augs_and_ensemble": "augs_and_ensemble",
+        // augs_and_ensemble    no_augs_no_ensemble   only_augs   only_eval
+        "eval_ensemble": true,
+        "eval_ensemble_not_mixing_xy": true,
+        "ensemble_method": "mean"
+      }
+  },
+
+
+
+
+
+  "xt_optimization_config": {
+    "save_final_images": true,
+    "validity_loss_ration": 0.5,
+    "scaling_method": "loss_scaling",
+    //loss_scaling   gradient_scaling   no_scaling
+    "num_epochs": 1,
+    "faiss_nlist": 1024,
+    "faiss_nprobe": 1,
+    "optimization": {
+      "name": "Adam",
+      //optimizers: "Adam" "SGD"
+      "lr": 0.01,
+      "SGD_momentum": 0.9
+    },
+    "NN_loss": {
+      "name": "weighted_MSE",
+      // "MSE"  "L1"  "weighted_MSE"
+      "weighted_MSE_norm_power": null,
+      //null or float. if float, normalizes weights to [0,1], and then **power
+      "weighted_MSE_cutoff": 1.0,
+      //null or float. Cannot be at the same time as weighted_MSE_norm_power
+      "weighted_MSE_dilation": 5,
+      //null or odd int. int does max over intXint filter (for example 3x3)
+      "NN_patch_size": [5, 1, 7],
+      //NN_patch_size: in [t, y, x]. For e.g. [5,1,7] is a 5x7 tx patch
+      //using flips may help but requires significant more memory.
+      "hor_flip": false,
+      //no point in ver_flip, since using xt patches
+      "temporal_flip": false
+    },
+    "NN_loss_2": {
+      "enable": false,
+      //enable: use two NN losses. To enable both xt and xy patches for example
+      "weight_in_NN": 0.5,
+      //weight_in_NN: weight for this NN compared to other NN loss (regardless of val vs NN ratio)
+      "name": "weighted_MSE",
+      // "MSE"  "L1"  "weighted_MSE"
+      "NN_patch_size": [1, 5, 5],
+      //"NN_patch_size": [5, 1, 7],
+      "hor_flip": false,
+      //no point in ver_flip, since using xt patches
+      "temporal_flip": false
+    },
+    "validity_loss": {
+      "name": "weighted_MSE",
+      // "MSE"  "L1"  "weighted_MSE"
+      "validity_patch_size": [1, 5, 5],
+      "edit_weights": "reversal"
+      //"reversal"    "none"     "inverse"
+    }
+  }
+}

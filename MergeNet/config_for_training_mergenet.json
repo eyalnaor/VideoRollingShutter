@@ -1,0 +1,112 @@
+{
+  "debug": false,
+  "skip_val": false,
+  //skip_val: to enable leaner runs
+  "working_dir": "",
+  "loading_model": {
+    "checkpoint": "",
+//    "checkpoint": "",
+    "only_eval": true,
+    "only_fine_tune": false
+  },
+  "datasets_ratios": null,
+  "training_input_father_dir": [""],
+  "training_input_in_name": ["left"],
+  "training_gt_father_dir": [""],
+  "val_input_father_dir": [""],
+  "val_gt_father_dir": [""],
+  "fine_tuning": {
+    "fine_tune_datasets": null,
+
+    "fine_tune": false,
+    "input_dir":[],
+    "input_in_name": [],
+    "gt_dir": [],
+    "gt_in_name": [],
+    "finetuning_lr": 0.001,
+    "finetuning_epochs": 5
+  },
+  "test_set": {
+    "eval_on_test_at_end": true,
+    "save_test_images": true,
+//     save_test_images: if true, saves the actual results. If false, only prints numerical results
+    "test_input_father_dir": "",
+    "test_gt_father_dir": ""
+  },
+  "preload_training_data": false,
+  "preload_val_data": true,
+  "tag": "",
+  "output_type": "image",
+  "image_resudual": true,
+  //  "image" or "weights".  image: outputs "merged" RGB directly.   weights: outputs weights for augs to merge by
+  "architecture": {
+    "hidden_depth": 6,
+    "hidden_width": 64,
+    "activation": "ReLU",
+    "conv_kernel_size": [3,3]
+  },
+  "data_augmenter": {
+    "augs_and_ensemble": "augs_and_ensemble",
+    // augs_and_ensemble    no_augs_no_ensemble   only_augs   only_eval
+    "crop_size": null,
+    //  null     256          (int, gives random intXint crop)
+    "crop_without_edge_percent": 0.0,
+    //percent of image (all sides) to avoid taking training crops from
+    "flip_hor_prob": 0.5,
+    "flip_ver_prob": 0.0,
+    "rot_prob": 0.75,
+    "eval_ensemble": true,
+    "eval_ensemble_not_mixing_xy": true,
+    "ensemble_method": "mean"
+  },
+  "num_epochs": 1000,
+  "num_iter_per_epoch": 3,
+  "batch_size": 10,
+  "val_every": 100,
+  "save_model_every": 100,
+  "optimization": {
+    "name": "Adam",
+    //"Adam" "SGD"
+    "lr": 0.001,
+	"SGD_momentum": 0.9
+  },
+  "loss": {
+    "name": "MSE",
+   // "MSE" "L1" "laplacian"
+    "MSE_reduction": "mean",
+    "laplacian_params": {
+      "laplacian_dist": "MSE",
+      "laplacian_kernel_size": 5,
+      //MSE   L1  - how to calculate loss between laplacians
+      "MSE_reduction": "mean",
+      "additional_loss": "L1",
+      "laplacian_weight": 0.75,
+      // loss=lap_weight*lap_dist + (1-lap_weight)*additional_loss
+      "normalize_laplacian": true
+      //normalize_laplacian: multiply laplacians to be in same range as images: [0,1]
+    }
+  },
+    "lr_sched": {
+    "name": "MultiStepLR_percentages",
+    // MultiStepLR - for manually set milestones , StepLR for fixed % out of total epochs , MultiStepLR_percentages for manual percentages out of total epochs
+    "params": {
+//      "gamma": 0.67,
+      "gamma": 0.1,
+      // Relevant for StepLR
+//      "step_size": 0.1,
+      "step_size": 0.75,
+      // Only relevant when using MultiStepLR
+      "milestones": [
+        3000,
+        3500
+      ],
+      // Only relevant when using MultiStepLR_percentages
+      "milestones_percentages": [
+        0.75,
+        0.90
+      ]
+    }
+  },
+    "trainer" : {
+  }
+}
